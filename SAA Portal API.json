@@ -1,110 +1,85 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.1",
   "info": {
-    "title": "RAPIDS Salesforce - OpenAPI 3.0",
-    "description": "This is a for Salesforce to query RAPIDS data",
-    "contact": {
-      "email": "apprenticeship.ithelp@dol.gov"
-    },
+    "title": "RAPIDS SAA Portal",
     "version": "1.0.0"
-  },
-  "externalDocs": {
-    "description": "Find out more about Apprenticeship",
-    "url": "http://apprenticeship.gov"
   },
   "servers": [
     {
-      "url": "https://doldev.appiancloud.com/suite/webapi/rapids-sf"
+      "url": "https://dol.appiancloud.com/suite/webapi"
     }
   ],
   "tags": [
     {
-      "name": "apprentice",
-      "description": "Subset of Apprentice data for Salesforce"
+      "name": "SAA Portal",
+      "description": "Create or update a record"
     }
   ],
   "paths": {
-    "/apprentice/search": {
-      "get": {
+    "/rapids-saa-portal-appr": {
+      "post": {
         "tags": [
-          "apprentice"
+          "SAA Portal"
         ],
-        "summary": "Finds Apprentice by apprentice number",
-        "description": "Multiple apprentice numbers can be provided with comma separated strings.",
-        "operationId": "findApprenticeByNumber",
-        "parameters": [
-          {
-            "name": "apprNumber",
-            "in": "query",
-            "description": "Apprentice Number to filter by",
-            "required": false,
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
+        "description": "Add RAPIDS SAA Portal Apprentices",
+        "operationId": "RAPIDS SAA Portal - Apprentice",
+        "requestBody": {
+          "description": "Add/Update a list of SAA Portal apprentices",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprenticeRequest"
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "successful operation",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Apprentice"
-                  }
+                  "$ref": "#/components/schemas/ApprenticeResponse"
                 }
               }
             }
           }
         }
-      },
+      }
+    },
+    "/rapids-saa-portal-sponsor": {
       "post": {
         "tags": [
-          "apprentice"
+          "SAA Portal"
         ],
-        "summary": "Finds Apprentice using search parameters",
-        "description": "Multiple input parameters can be provided in the request body",
-        "operationId": "findApprenticeByParams",
+        "description": "Add RAPIDS SAA Portal Sponsor ",
+        "operationId": "RAPIDS SAA Portal - Sponsor",
         "requestBody": {
-          "description": "Search using input fields",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ApprenticeSearchParameters"
+                "$ref": "#/components/schemas/SponsorRequest"
               }
             }
           }
         },
-        "parameters": [
-          {
-            "name": "apprNumber",
-            "in": "query",
-            "description": "Apprentice Number to filter by",
-            "required": false,
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
-            "description": "successful operation",
+            "description": "Success",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Apprentice"
-                  }
+                  "$ref": "#/components/schemas/SponsorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation exception",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvalidResponse"
                 }
               }
             }
@@ -115,169 +90,641 @@
   },
   "components": {
     "schemas": {
+      "InvalidResponse": {
+        "type": "object",
+        "properties": {
+          "errorMessage": {
+            "type": "string",
+            "example": "There is no SAA State assigned for this user"
+          }
+        }
+      },
       "Apprentice": {
         "type": "object",
         "properties": {
-          "Apprentice_Record": {
+          "uniqueId": {
             "type": "string",
-            "example": "SC2021000001"
+            "description": "Unique Apprentice Identifier",
+            "example": "VA2023000001"
           },
-          "Apprentice_Registration_Date": {
+          "sponsorId": {
             "type": "string",
-            "format": "date"
+            "description": "Sponsor Identifier",
+            "example": "2022-VA-1234"
           },
-          "Apprentice_Start_Date": {
+          "dob": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "Date the apprentice was born",
+            "example": "1988-09-05"
           },
-          "Program_Number": {
-            "type": "string",
-            "example": "2022-SC-1234"
+          "genderInd": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2,
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Gender: * 1 = Male * 2 = Female * 9 = Participant did not self-identify\n"
           },
-          "Occupation_Title": {
+          "ethnicInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              9
+            ],
+            "description": "Ethnicity Hispanic / Latino * 1 = Yes * 2 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "natIndianInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "asianInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "africaAmerInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "nathawaiInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "wInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "vetStatInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "disabilityInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "education": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "termlength": {
+            "type": "integer",
+            "description": "Total length of the apprenticeship in hours",
+            "format": "int64",
+            "example": 2000
+          },
+          "termlengthRemaining": {
+            "type": "integer",
+            "description": "Total length remaining until the apprenticeship is complete (in hours)",
+            "format": "int64",
+            "example": 1500
+          },
+          "startDt": {
             "type": "string",
+            "description": "Date Apprenticeship Begins",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "expCompDt": {
+            "type": "string",
+            "description": "Expected completion date",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "exitDt": {
+            "type": "string",
+            "description": "Date the apprentice left the apprenticeship (either completed or cancelled)",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "status": {
+            "type": "string",
+            "example": "RE",
+            "enum": [
+              "RE",
+              "CA",
+              "CO"
+            ],
+            "description": "Current status of the apprentice * RE - Registered * CA - Cancelled * CO - Completed\n"
+          },
+          "statusReason": {
+            "type": "string",
+            "description": "Reason why the status was updated (ie cancellation reason)",
+            "example": "Moved out of country"
+          },
+          "entryWage": {
+            "type": "string",
+            "format": "decimal",
+            "description": "Enter the Apprentices hourly Entry wage.",
+            "example": 20
+          },
+          "exitWage": {
+            "type": "string",
+            "description": "Enter the Apprentices hourly Exit wage.  This wage cannot be less than the Apprentice hourly Entry wage for the occupation.",
+            "format": "decimal",
+            "example": 100
+          },
+          "onetSocCode": {
+            "type": "string",
+            "description": "O*NET SOC Code of the apprentice's occupation. For more information visit onetcenteronline.org",
+            "example": "47-1111.00"
+          },
+          "occTitle": {
+            "type": "string",
+            "description": "Name of the apprentice's occupation",
             "example": "Electrician"
           },
-          "RAPIDS_Occupation_Code": {
+          "occType": {
             "type": "string",
-            "example": 145
-          },
-          "O_NET_SOC_Code": {
-            "type": "string",
-            "example": "25-2345.00"
-          },
-          "Occupation_Type": {
-            "type": "string",
-            "description": "type of occupation",
+            "example": "HY",
             "enum": [
-              "Time-Based",
-              "Competency-Based",
-              "Hybrid"
-            ]
-          },
-          "Age_At_Start": {
-            "type": "number",
-            "description": "age of apprentice at start of program",
-            "example": 18
-          },
-          "Hispanic_Latino_Ethnicity": {
-            "type": "string",
-            "description": "type of occupation",
-            "enum": [
-              "Hispanic",
-              "Non-Hispanic",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "Veteran_Status": {
-            "type": "string",
-            "description": "type of occupation",
-            "enum": [
-              "Veteran",
-              "Non-Veteran",
-              "Non-Veteran, Other Eligible Individual",
-              "Veteran, Eligible",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "Sex": {
-            "type": "string",
-            "enum": [
-              "Male",
-              "Female",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "Disability": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "Education": {
-            "type": "string",
-            "enum": [
-              "Not High School graduate",
-              "High School graduate (including equivalency)",
-              "Some College or Associate’s degree",
-              "Bachelor's degree",
-              "Master's degree",
-              "Doctorate or professional degree",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "Currently_or_Formerly_Incarcerated": {
-            "type": "string",
-            "enum": [
-              "Yes",
-              "No",
-              "Participant Did Not Self-Identify"
-            ]
-          },
-          "American_Indian_Alaskan_Native": {
-            "type": "boolean",
-            "enum": [
-              true,
-              false
-            ]
-          },
-          "Asian": {
-            "type": "boolean",
-            "enum": [
-              true,
-              false
-            ]
-          },
-          "Black_African_American": {
-            "type": "boolean",
-            "enum": [
-              true,
-              false
-            ]
-          },
-          "Native_Hawaiian_Other_Pacific_Islander": {
-            "type": "boolean",
-            "enum": [
-              true,
-              false
-            ]
-          },
-          "White": {
-            "type": "boolean",
-            "enum": [
-              true,
-              false
-            ]
-          },
-          "Error_Message": {
-            "type": "string",
-            "description": "Only populated if the Apprentice Record could not be found",
-            "example": "Apprentice not found"
+              "TB",
+              "CB",
+              "HY"
+            ],
+            "description": "Type of occupation * TB - Time Based * CB - Competency-Based * HY - Hybrid\n"
           }
-        },
-        "xml": {
-          "name": "apprentice"
         }
       },
-      "ApprenticeSearchParameters": {
+      "ApprenticeRequest": {
         "type": "object",
         "properties": {
-          "apprNumber": {
+          "apprList": {
             "type": "array",
             "items": {
-              "type": "string"
-            },
-            "example": [
-              "SC2021000001",
-              "SC2021000001"
-            ]
+              "$ref": "#/components/schemas/Apprentice"
+            }
           }
-        },
-        "xml": {
-          "name": "apprenticeSearchParameters"
         }
+      },
+      "ApprenticeResponse": {
+        "type": "object",
+        "properties": {
+          "uniqueId": {
+            "type": "string",
+            "description": "RAPIDS-Generated Unique Apprentice Identifier",
+            "example": "VA_VA2023000001"
+          },
+          "sponsorId": {
+            "type": "string",
+            "description": "Sponsor Identifier",
+            "example": "2022-VA-1234"
+          },
+          "state": {
+            "type": "string",
+            "description": "Routing State",
+            "example": "VA"
+          },
+          "dob": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the apprentice was born",
+            "example": "1988-09-05"
+          },
+          "ageAtReg": {
+            "type": "string",
+            "description": "Age at Registration (Calculated)",
+            "example": 25
+          },
+          "genderInd": {
+            "type": "integer",
+            "format": "int32",
+            "example": 2,
+            "enum": [
+              1,
+              2
+            ],
+            "description": "Gender: * 1 = Male * 2 = Female * 9 = Participant did not self-identify\n"
+          },
+          "ethnicInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              9
+            ],
+            "description": "Ethnicity Hispanic / Latino * 1 = Yes * 2 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "natIndianInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "asianInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "africaAmerInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "nathawaiInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "wInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "vetStatInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "disabilityInd": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "education": {
+            "type": "integer",
+            "enum": [
+              1,
+              0,
+              9
+            ],
+            "description": "Race - American Indian / Alaskan Native * 1 = Yes * 0 = No * 9 = Participant did not self-identify\n",
+            "example": 1
+          },
+          "termlength": {
+            "type": "integer",
+            "description": "Total length of the apprenticeship in hours",
+            "format": "int64",
+            "example": 2000
+          },
+          "termlengthRemaining": {
+            "type": "integer",
+            "description": "Total length remaining until the apprenticeship is complete (in hours)",
+            "format": "int64",
+            "example": 1500
+          },
+          "startDt": {
+            "type": "string",
+            "description": "Date Apprenticeship Begins",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "expCompDt": {
+            "type": "string",
+            "description": "Expected completion date",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "exitDt": {
+            "type": "string",
+            "description": "Date the apprentice left the apprenticeship (either completed or cancelled)",
+            "format": "date",
+            "example": "2022-05-08"
+          },
+          "status": {
+            "type": "string",
+            "example": "RE",
+            "enum": [
+              "RE",
+              "CA",
+              "CO"
+            ],
+            "description": "Current status of the apprentice * RE - Registered * CA - Cancelled * CO - Completed\n"
+          },
+          "statusReason": {
+            "type": "string",
+            "description": "Reason why the status was updated (ie cancellation reason)",
+            "example": "Moved out of country"
+          },
+          "entryWage": {
+            "type": "string",
+            "format": "decimal",
+            "description": "Enter the Apprentices hourly Entry wage.",
+            "example": 20
+          },
+          "exitWage": {
+            "type": "string",
+            "description": "Enter the Apprentices hourly Exit wage.  This wage cannot be less than the Apprentice hourly Entry wage for the occupation.",
+            "format": "decimal",
+            "example": 100
+          },
+          "onetSocCode": {
+            "type": "string",
+            "description": "O*NET SOC Code of the apprentice's occupation. For more information visit onetcenteronline.org",
+            "example": "47-1111.00"
+          },
+          "occTitle": {
+            "type": "string",
+            "description": "Name of the apprentice's occupation",
+            "example": "Electrician"
+          },
+          "occType": {
+            "type": "string",
+            "example": "HY",
+            "enum": [
+              "TB",
+              "CB",
+              "HY"
+            ],
+            "description": "Type of occupation * TB - Time Based * CB - Competency-Based * HY - Hybrid\n"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "User who created the record",
+            "example": "saa.portal.va"
+          },
+          "createdDt": {
+            "type": "string",
+            "description": "Date the record was created",
+            "format": "date-time",
+            "example": "2022-11-01T16:10:09.000Z"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "User who updated the record",
+            "example": "saa.portal.va,"
+          },
+          "updatedDt": {
+            "type": "string",
+            "description": "Date the record was updated",
+            "format": "date-time",
+            "example": "2022-11-08T16:10:09.000Z"
+          }
+        }
+      },
+      "Sponsor": {
+        "type": "object",
+        "properties": {
+          "sponId": {
+            "type": "string",
+            "description": "Unique Sponsor Identifier",
+            "example": "2022-VA-12345"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the Sponsor",
+            "example": "University of Virginia"
+          },
+          "street": {
+            "type": "string",
+            "description": "The Sponsor’s street address",
+            "example": "VA"
+          },
+          "city": {
+            "type": "string",
+            "description": "The Sponsor’s city",
+            "example": "Fairfax"
+          },
+          "state": {
+            "type": "string",
+            "description": "The Sponsor’s state",
+            "example": "VA"
+          },
+          "zip": {
+            "type": "integer",
+            "description": "The Sponsor’s 5 digit zip code",
+            "format": "int64",
+            "example": 22030
+          },
+          "naics": {
+            "type": "integer",
+            "description": "The Sponsor’s 6 digit NAICS code",
+            "format": "int64",
+            "example": 111100
+          },
+          "programType": {
+            "type": "string",
+            "example": "INJ",
+            "enum": [
+              "INJ",
+              "IJ",
+              "GNJ",
+              "GJ"
+            ],
+            "description": "The type of program: * INJ - Independent, Non Joint * IJ - Independent, Joint * GNJ - Group, Non Joint * GJ - Group, Joint\n"
+          },
+          "regDt": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the program sponsor was registered",
+            "example": "2015-09-28"
+          },
+          "status": {
+            "type": "string",
+            "description": "Is the program currently registered or in a cancelled status?",
+            "example": "RE"
+          },
+          "exitDt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-01-12T00:00:00.000Z"
+          }
+        }
+      },
+      "SponsorRequest": {
+        "type": "object",
+        "properties": {
+          "sponsorList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Sponsor"
+            }
+          }
+        }
+      },
+      "SponsorResponse": {
+        "type": "object",
+        "properties": {
+          "uniqueId": {
+            "type": "string",
+            "description": "RAPIDS-Generated Unique Identifier",
+            "example": "VA_2022-VA-12345"
+          },
+          "sponId": {
+            "type": "string",
+            "description": "Unique Sponsor Identifier",
+            "example": "2022-VA-12345"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the Sponsor",
+            "example": "University of Virginia"
+          },
+          "street": {
+            "type": "string",
+            "description": "The Sponsor’s street address",
+            "example": "VA"
+          },
+          "city": {
+            "type": "string",
+            "description": "The Sponsor’s city",
+            "example": "Fairfax"
+          },
+          "state": {
+            "type": "string",
+            "description": "The Sponsor’s state",
+            "example": "VA"
+          },
+          "zip": {
+            "type": "integer",
+            "description": "The Sponsor’s 5 digit zip code",
+            "format": "int64",
+            "example": 22030
+          },
+          "naics": {
+            "type": "integer",
+            "description": "The Sponsor’s 6 digit NAICS code",
+            "format": "int64",
+            "example": 111100
+          },
+          "programType": {
+            "type": "string",
+            "example": "INJ",
+            "enum": [
+              "INJ",
+              "IJ",
+              "GNJ",
+              "GJ"
+            ],
+            "description": "The type of program: * INJ - Independent, Non Joint * IJ - Independent, Joint * GNJ - Group, Non Joint * GJ - Group, Joint\n"
+          },
+          "regDt": {
+            "type": "string",
+            "format": "date",
+            "description": "Date the program sponsor was registered",
+            "example": "2015-09-28"
+          },
+          "status": {
+            "type": "string",
+            "description": "Is the program currently registered or in a cancelled status?",
+            "example": "RE"
+          },
+          "exitDt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2022-01-12T00:00:00.000Z"
+          },
+          "createdBy": {
+            "type": "string",
+            "description": "User who created the record",
+            "example": "saa.portal.va"
+          },
+          "createdDt": {
+            "type": "string",
+            "description": "Date the record was created",
+            "format": "date-time",
+            "example": "2022-11-01T16:10:09.000Z"
+          },
+          "updatedBy": {
+            "type": "string",
+            "description": "User who updated the record",
+            "example": "saa.portal.va,"
+          },
+          "updatedDt": {
+            "type": "string",
+            "description": "Date the record was updated",
+            "format": "date-time",
+            "example": "2022-11-08T16:10:09.000Z"
+          },
+          "routingState": {
+            "type": "string",
+            "description": "State Routing",
+            "example": "VA"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "api_key": {
+        "type": "apiKey",
+        "name": "Appian-API-Key",
+        "in": "header"
       }
     }
   }
