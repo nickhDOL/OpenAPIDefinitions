@@ -1,0 +1,284 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "RAPIDS Salesforce - OpenAPI 3.0",
+    "description": "This is a for Salesforce to query RAPIDS data",
+    "contact": {
+      "email": "apprenticeship.ithelp@dol.gov"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Apprenticeship",
+    "url": "http://apprenticeship.gov"
+  },
+  "servers": [
+    {
+      "url": "https://doldev.appiancloud.com/suite/webapi/rapids-sf"
+    }
+  ],
+  "tags": [
+    {
+      "name": "apprentice",
+      "description": "Subset of Apprentice data for Salesforce"
+    }
+  ],
+  "paths": {
+    "/apprentice/search": {
+      "get": {
+        "tags": [
+          "apprentice"
+        ],
+        "summary": "Finds Apprentice by apprentice number",
+        "description": "Multiple apprentice numbers can be provided with comma separated strings.",
+        "operationId": "findApprenticeByNumber",
+        "parameters": [
+          {
+            "name": "apprNumber",
+            "in": "query",
+            "description": "Apprentice Number to filter by",
+            "required": false,
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Apprentice"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "apprentice"
+        ],
+        "summary": "Finds Apprentice using search parameters",
+        "description": "Multiple input parameters can be provided in the request body",
+        "operationId": "findApprenticeByParams",
+        "requestBody": {
+          "description": "Search using input fields",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApprenticeSearchParameters"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "apprNumber",
+            "in": "query",
+            "description": "Apprentice Number to filter by",
+            "required": false,
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Apprentice"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Apprentice": {
+        "type": "object",
+        "properties": {
+          "Apprentice_Record": {
+            "type": "string",
+            "example": "SC2021000001"
+          },
+          "Apprentice_Registration_Date": {
+            "type": "string",
+            "format": "date"
+          },
+          "Apprentice_Start_Date": {
+            "type": "string",
+            "format": "date"
+          },
+          "Program_Number": {
+            "type": "string",
+            "example": "2022-SC-1234"
+          },
+          "Occupation_Title": {
+            "type": "string",
+            "example": "Electrician"
+          },
+          "RAPIDS_Occupation_Code": {
+            "type": "string",
+            "example": 145
+          },
+          "O_NET_SOC_Code": {
+            "type": "string",
+            "example": "25-2345.00"
+          },
+          "Occupation_Type": {
+            "type": "string",
+            "description": "type of occupation",
+            "enum": [
+              "Time-Based",
+              "Competency-Based",
+              "Hybrid"
+            ]
+          },
+          "Age_At_Start": {
+            "type": "number",
+            "description": "age of apprentice at start of program",
+            "example": 18
+          },
+          "Hispanic_Latino_Ethnicity": {
+            "type": "string",
+            "description": "type of occupation",
+            "enum": [
+              "Hispanic",
+              "Non-Hispanic",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "Veteran_Status": {
+            "type": "string",
+            "description": "type of occupation",
+            "enum": [
+              "Veteran",
+              "Non-Veteran",
+              "Non-Veteran, Other Eligible Individual",
+              "Veteran, Eligible",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "Sex": {
+            "type": "string",
+            "enum": [
+              "Male",
+              "Female",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "Disability": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "Education": {
+            "type": "string",
+            "enum": [
+              "Not High School graduate",
+              "High School graduate (including equivalency)",
+              "Some College or Associate’s degree",
+              "Bachelor's degree",
+              "Master's degree",
+              "Doctorate or professional degree",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "Currently_or_Formerly_Incarcerated": {
+            "type": "string",
+            "enum": [
+              "Yes",
+              "No",
+              "Participant Did Not Self-Identify"
+            ]
+          },
+          "American_Indian_Alaskan_Native": {
+            "type": "boolean",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "Asian": {
+            "type": "boolean",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "Black_African_American": {
+            "type": "boolean",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "Native_Hawaiian_Other_Pacific_Islander": {
+            "type": "boolean",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "White": {
+            "type": "boolean",
+            "enum": [
+              true,
+              false
+            ]
+          },
+          "Error_Message": {
+            "type": "string",
+            "description": "Only populated if the Apprentice Record could not be found",
+            "example": "Apprentice not found"
+          }
+        },
+        "xml": {
+          "name": "apprentice"
+        }
+      },
+      "ApprenticeSearchParameters": {
+        "type": "object",
+        "properties": {
+          "apprNumber": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": [
+              "SC2021000001",
+              "SC2021000001"
+            ]
+          }
+        },
+        "xml": {
+          "name": "apprenticeSearchParameters"
+        }
+      }
+    }
+  }
+}
